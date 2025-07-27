@@ -34,7 +34,10 @@ export default {
     },
     getRecommendations(position) {
       const { latitude, longitude } = position.coords;
-      axios.get(`/api/recommendations/?latitude=${latitude}&longitude=${longitude}`)
+      axios.post('/api/recommendations/', {
+        lat: latitude,
+        lng: longitude,
+      })
         .then(response => {
           this.recommendations = response.data;
         })
