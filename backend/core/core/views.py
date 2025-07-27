@@ -9,10 +9,10 @@ def recommendations(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            latitude = data['lat']
-            longitude = data['lng']
+            latitude = float(data['lat'])
+            longitude = float(data['lng'])
             return JsonResponse(get_ph_recommendations(latitude, longitude), safe=False)
-        except (KeyError, json.JSONDecodeError):
+        except (KeyError, json.JSONDecodeError, ValueError):
             return JsonResponse({'error': 'Invalid location data'}, status=400)
     elif request.method == 'GET':
         # Use a default location for GET requests

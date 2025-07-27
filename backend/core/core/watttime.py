@@ -23,6 +23,9 @@ def get_grid_region(latitude: float, longitude: float):
     except requests.exceptions.RequestException as e:
         logger.error(f"Error getting grid region: {e}")
         return None
+    except KeyError:
+        logger.error(f"Could not find region in Watttime API response: {response.text}")
+        return None
 
 def get_realtime_emissions(grid_region: str):
     """
@@ -37,4 +40,7 @@ def get_realtime_emissions(grid_region: str):
         return response.json()
     except requests.exceptions.RequestException as e:
         logger.error(f"Error getting real-time emissions: {e}")
-        return None
+        return {"error": f"Could not get real-time emissions data: {e}"}
+    except KeyError:
+        logger.error(f"Could not find emissions data in Watttime API response: {response.text}")
+        return {"error": "Could not find emissions data in Watttime API response."}

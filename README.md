@@ -39,6 +39,12 @@ These instructions will get you a copy of the project up and running on your loc
    npm run serve
    ```
 
+## Error Handling
+
+If you are unable to get recommendations, please ensure that you have enabled location services in your browser and that you have a stable internet connection. If you continue to experience issues, please try again later.
+
+The backend uses a default grid region of "PH" (Philippines) if it is unable to determine your grid region from your location.
+
 ## Deployment
 
 The project is deployed to AWS Manila using a CI/CD pipeline with GitHub Actions.
