@@ -1,22 +1,18 @@
 <template>
-  <div id="app">
-    <h1>EcoCharge Dashboard</h1>
-  </div>
+  <DashboardLayout>
+    <Recommendations />
+  </DashboardLayout>
 </template>
 
 <script>
+import DashboardLayout from './layouts/DashboardLayout.vue';
+import Recommendations from './components/Recommendations.vue';
+
 export default {
   name: 'App',
-}
+  components: {
+    DashboardLayout,
+    Recommendations,
+  },
+};
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
