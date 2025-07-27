@@ -6,11 +6,14 @@ def get_ph_recommendations(latitude: float, longitude: float):
     """
     grid_region = get_grid_region(latitude, longitude)
     if not grid_region:
-        return ["Could not determine grid region."]
+        grid_region = "PH" # Default to Philippines grid region
 
     emissions = get_realtime_emissions(grid_region)
     if not emissions:
         return ["Could not get real-time emissions data."]
+
+    if "error" in emissions:
+        return [emissions["error"]]
 
     if emissions["percent"] < 50:
         return [

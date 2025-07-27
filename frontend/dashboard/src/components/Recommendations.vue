@@ -1,7 +1,11 @@
 <template>
   <div class="recommendations">
     <h2>Energy Saving Recommendations</h2>
-    <div v-if="error" class="error">{{ error }}</div>
+    <div v-if="error" class="error">
+      <p>{{ error }}</p>
+      <p>Please ensure that you have enabled location services in your browser and that you have a stable internet connection.</p>
+      <p>If you continue to experience issues, please try again later.</p>
+    </div>
     <ul>
       <li v-for="recommendation in recommendations" :key="recommendation">
         {{ recommendation }}
@@ -39,7 +43,11 @@ export default {
         lng: longitude,
       })
         .then(response => {
-          this.recommendations = response.data;
+          if (response.data.error) {
+            this.error = response.data.error;
+          } else {
+            this.recommendations = response.data;
+          }
         })
         .catch(error => {
           console.error(error);
@@ -73,5 +81,8 @@ export default {
 
 .error {
   color: red;
+  border: 1px solid red;
+  padding: 1rem;
+  margin-bottom: 1rem;
 }
 </style>
