@@ -5,6 +5,7 @@ from requests.auth import HTTPBasicAuth
 WATTTIME_API_TOKEN = os.environ.get("WATTTIME_API_TOKEN")
 WATTTIME_API_URL = "https://api.watttime.org/v2"
 
+
 def get_grid_region(latitude: float, longitude: float):
     """
     Get the grid region for a given location.
