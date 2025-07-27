@@ -2,3 +2,4 @@ django
 fastapi
 uvicorn
 requests
+django-cors-headers
