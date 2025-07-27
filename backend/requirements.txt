@@ -2,4 +2,8 @@ django
 fastapi
 uvicorn
 requests
+<<<<<<< HEAD
 django-cors-headers
+=======
+django-cors-headers
+>>>>>>> 0e5e065fcba597ee84153138add381a078b4ad3a
