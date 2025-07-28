@@ -39,6 +39,10 @@ export default {
       axios.post('/api/recommendations/', {
         lat: latitude,
         lng: longitude,
+      }, {
+        headers: {
+          'X-Client-Region': Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }
       })
         .then(response => {
           if (response.data.error) {
