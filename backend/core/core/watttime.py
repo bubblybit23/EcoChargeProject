@@ -4,6 +4,10 @@ import logging
 from requests.auth import HTTPBasicAuth
 from json import JSONDecodeError
 from .errors import EmissionsDataError
+from load_dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
