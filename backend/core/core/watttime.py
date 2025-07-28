@@ -12,9 +12,34 @@ load_dotenv()
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-WATTTIME_API_TOKEN = os.environ.get("WATTTIME_API_TOKEN")
 WATTTIME_API_URL = "https://api.watttime.org/v3"
+WATTTIME_API_URL_LOGIN = 'https://api.watttime.org/login'
+WATTTIME_USER = os.environ.get("WATTTIME_USER")
+WATTTIME_PASS = os.environ.get("WATTTIME_PASS")
 
+
+
+def get_API_token(WATTTIME_USER: str, WATTTIME_PASS: str) -> str:
+    """
+    Get the WattTime API token using basic authentication.
+    """
+    try:
+        response = requests.get(
+            f"{WATTTIME_API_URL_LOGIN}",
+            auth=HTTPBasicAuth(WATTTIME_USER, WATTTIME_PASS),
+            headers={"Accept": "application/json"}
+        )
+        logger.info(f"Watttime API response for get_API_token: {response.text}")
+
+        if response.status_code != 200:
+            raise EmissionsDataError(f"WattTime API returned {response.status_code}")
+
+        return response.json().get("token", "")
+    except requests.exceptions.RequestException as e:
+        raise EmissionsDataError(f"Error getting API token: {e}") from e
+
+WATTTIME_API_TOKEN = get_API_token(WATTTIME_USER, WATTTIME_PASS)
+    
 def get_grid_region(latitude: float, longitude: float):
     """
     Get the grid region for a given location.
@@ -49,6 +74,7 @@ def get_grid_region(latitude: float, longitude: float):
 
     except requests.exceptions.RequestException as e:
         raise EmissionsDataError(f"Error getting grid region: {e}") from e
+
 
 
 def get_realtime_emissions(grid_region: str):
