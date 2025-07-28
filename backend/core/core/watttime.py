@@ -13,7 +13,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 WATTTIME_API_TOKEN = os.environ.get("WATTTIME_API_TOKEN")
-WATTTIME_API_URL = "https://api.watttime.org/v2"
+WATTTIME_API_URL = "https://api.watttime.org/v3"
 
 
 def get_grid_region(latitude: float, longitude: float):
@@ -24,9 +24,10 @@ def get_grid_region(latitude: float, longitude: float):
         raise ValueError("Invalid coordinates")
 
     headers = {"Authorization": f"Bearer {WATTTIME_API_TOKEN}"}
-    params = {"latitude": latitude, "longitude": longitude}
+    params = {"latitude": "42.372", "longitude": "-72.519", "signal_type": "co2_moer"}
     try:
-        response = requests.get(f"{WATTTIME_API_URL}/ba-from-loc", headers=headers, params=params)
+        response = requests.get(f"{WATTTIME_API_URL}/region-from-loc", headers=headers, params=params)
+        response.raise_for_status()
         logger.info(f"Watttime API response for get_grid_region: {response.text}")
 
         if response.status_code != 200:
@@ -39,7 +40,7 @@ def get_grid_region(latitude: float, longitude: float):
             raise EmissionsDataError("Non-JSON response received")
 
         try:
-            return response.json()['ba']
+            return response.json()['region']
         except JSONDecodeError as e:
             raise EmissionsDataError(f"JSON parsing failed: {e}. Response: {response.text[:100]}") from e
         except KeyError:
