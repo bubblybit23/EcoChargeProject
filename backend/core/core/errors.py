@@ -1,0 +1,2 @@
+class EmissionsDataError(Exception):
+    pass
