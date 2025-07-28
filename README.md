@@ -60,9 +60,6 @@ The project is deployed to AWS Manila using a CI/CD pipeline with GitHub Actions
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Authors
-
-* **Jules** - *Initial work*
 
 ## License
 
