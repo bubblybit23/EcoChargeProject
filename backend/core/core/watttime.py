@@ -75,9 +75,11 @@ def get_realtime_emissions(grid_region: str):
 
         try:
             data = response.json()
-            if 'percent' not in data:
+            if 'data' not in data or not data['data']:
+                raise EmissionsDataError("Could not find 'data' in Watttime API response.")
+            if 'percent' not in data['data'][0]:
                 raise EmissionsDataError("Could not find 'percent' in Watttime API response.")
-            return data
+            return data['data'][0]
         except JSONDecodeError as e:
             raise EmissionsDataError(f"JSON parsing failed: {e}. Response: {response.text[:100]}") from e
 
