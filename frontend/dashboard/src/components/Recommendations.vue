@@ -2,9 +2,7 @@
   <div class="recommendations">
     <h2>Energy Saving Recommendations</h2>
     <div v-if="error" class="error">
-      <p>{{ error }}</p>
-      <p>Please ensure that you have enabled location services in your browser and that you have a stable internet connection.</p>
-      <p>If you continue to experience issues, please try again later.</p>
+      <p>{{ getErrorMessage(error) }}</p>
     </div>
     <ul>
       <li v-for="recommendation in recommendations" :key="recommendation">
@@ -51,7 +49,7 @@ export default {
         })
         .catch(error => {
           console.error(error);
-          this.error = "Could not get recommendations.";
+          this.error = error;
         });
     },
     handleLocationError(error) {
@@ -69,6 +67,12 @@ export default {
           this.error = "An unknown error occurred."
           break;
       }
+    },
+    getErrorMessage(error) {
+      if (error?.response?.data?.error?.includes('EMISSIONS_DATA')) {
+        return "Energy data service is currently unavailable";
+      }
+      return "Could not get recommendations";
     },
   },
 };

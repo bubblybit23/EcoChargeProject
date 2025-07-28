@@ -2,6 +2,8 @@ import os
 import requests
 import logging
 from requests.auth import HTTPBasicAuth
+from json import JSONDecodeError
+from .errors import EmissionsDataError
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -14,34 +16,61 @@ def get_grid_region(latitude: float, longitude: float):
     """
     Get the grid region for a given location.
     """
+    if not (-90 <= latitude <= 90) or not (-180 <= longitude <= 180):
+        raise ValueError("Invalid coordinates")
+
     headers = {"Authorization": f"Bearer {WATTTIME_API_TOKEN}"}
     params = {"latitude": latitude, "longitude": longitude}
     try:
-        response = requests.get(f"{WATTTIME_API_URL}/region-from-loc", headers=headers, params=params)
+        response = requests.get(f"{WATTTIME_API_URL}/ba-from-loc", headers=headers, params=params)
         logger.info(f"Watttime API response for get_grid_region: {response.text}")
-        response.raise_for_status()
-        return response.json()["region"]
+
+        if response.status_code != 200:
+            raise EmissionsDataError(f"WattTime API returned {response.status_code}")
+
+        if not response.text.strip():
+            raise EmissionsDataError("Empty response from WattTime API")
+
+        if 'application/json' not in response.headers.get('Content-Type', ''):
+            raise EmissionsDataError("Non-JSON response received")
+
+        try:
+            return response.json()['ba']
+        except JSONDecodeError as e:
+            raise EmissionsDataError(f"JSON parsing failed: {e}. Response: {response.text[:100]}") from e
+        except KeyError:
+            raise EmissionsDataError("Could not find 'ba' in Watttime API response.")
+
     except requests.exceptions.RequestException as e:
-        logger.error(f"Error getting grid region: {e}")
-        return None
-    except KeyError:
-        logger.error(f"Could not find region in Watttime API response: {response.text}")
-        return None
+        raise EmissionsDataError(f"Error getting grid region: {e}") from e
+
 
 def get_realtime_emissions(grid_region: str):
     """
     Get real-time emissions data for a given grid region.
     """
     headers = {"Authorization": f"Bearer {WATTTIME_API_TOKEN}"}
-    params = {"region": grid_region}
+    params = {"ba": grid_region, "style": "all"}
     try:
         response = requests.get(f"{WATTTIME_API_URL}/index", headers=headers, params=params)
         logger.info(f"Watttime API response for get_realtime_emissions: {response.text}")
-        response.raise_for_status()
-        return response.json()
+
+        if response.status_code != 200:
+            raise EmissionsDataError(f"WattTime API returned {response.status_code}")
+
+        if not response.text.strip():
+            raise EmissionsDataError("Empty response from WattTime API")
+
+        if 'application/json' not in response.headers.get('Content-Type', ''):
+            raise EmissionsDataError("Non-JSON response received")
+
+        try:
+            data = response.json()
+            if 'moer' not in data:
+                raise EmissionsDataError("Could not find 'moer' in Watttime API response.")
+            return data
+        except JSONDecodeError as e:
+            raise EmissionsDataError(f"JSON parsing failed: {e}. Response: {response.text[:100]}") from e
+
     except requests.exceptions.RequestException as e:
-        logger.error(f"Error getting real-time emissions: {e}")
-        return {"error": f"Could not get real-time emissions data: {e}"}
-    except KeyError:
-        logger.error(f"Could not find emissions data in Watttime API response: {response.text}")
-        return {"error": "Could not find emissions data in Watttime API response."}
+        raise EmissionsDataError(f"Error getting real-time emissions: {e}") from e
